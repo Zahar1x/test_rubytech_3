@@ -51,12 +51,12 @@ def delete(res_id):
 
 
 def create(resource):
-    user_id = resource.get("user_id")
+    user_id = resource.getUserId()
     user = User.query.get(user_id)
 
     if user:
         new_res = links_schema.load(resource, session=db.session)
-        user.notes.append(new_res)
+        user.Links.append(new_res)
         db.session.commit()
         return links_schema.dump(new_res), 201
     else:

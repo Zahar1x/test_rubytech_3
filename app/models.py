@@ -33,8 +33,13 @@ class Params(db.Model):
     uuid = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(32), nullable=False)
     value = db.Column(db.String(32), nullable=False)
-    fio = db.Column(db.String(60))
     resource_id = db.Column(db.Integer, db.ForeignKey("Links.uuid"))
+
+    def __init__(self, key, value, resource_id):
+        self.key = key
+        self.value = value
+        self.resource_id = resource_id
+
 
 
 class ParamsSchema(ma.SQLAlchemyAutoSchema):
@@ -79,6 +84,9 @@ class Links(db.Model):
         self.statuses = statuses
         self.params = params
 
+    def getUserId(self):
+        return self.user_id
+
 
 class LinksSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
@@ -102,13 +110,18 @@ class User(db.Model):
         single_parent=True,
     )
 
+    def __init__(self, email, password, fio):
+        self.email = email
+        self.password = password
+        self.fio = fio
+
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
         load_instance = True
         sqla_session = db.session
-        include_relationships = True
+        include_relationships = False
 
     Links = fields.Nested(LinksSchema, many=True)
 
